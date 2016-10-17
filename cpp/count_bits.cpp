@@ -90,6 +90,18 @@ int count_by_table8(uint16_t* data, int size)
     return sum;
 }
 
+int count_by_table8_unroll(uint16_t* data, int size)
+{
+    int sum = 0;
+    uint16_t tmp;
+    const uint64_t mask8  = 0xFF;
+    for (int i = 0; i < size; i++) {
+        tmp = data[i];
+        sum += s_table8[tmp & mask8] + s_table8[(tmp >> 8) & mask8];
+    }
+    return sum;
+}
+
 //-------------------------------------------------------------------------------
 // Bit operation.
 //-------------------------------------------------------------------------------
@@ -205,6 +217,7 @@ int main(void)
     test("count_directly        ", count_directly, data, kDataSize);
     test("count_by_table        ", count_by_table, data, kDataSize);
     test("count_by_table8       ", count_by_table8, data, kDataSize);
+    test("count_by_table8_unroll", count_by_table8_unroll, data, kDataSize);
     test("count_by_bit_operation", count_by_bit_operation, data, kDataSize);
 #ifdef SUPPORT_SSE4
     test("count_by_popcnt       ", count_by_popcnt, data, kDataSize);
