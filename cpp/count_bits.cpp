@@ -93,11 +93,20 @@ int count_by_table8(uint16_t* data, int size)
 int count_by_table8_unroll(uint16_t* data, int size)
 {
     int sum = 0;
-    uint16_t tmp;
+    uint16_t tmp16;
+    uint64_t tmp;
     const uint64_t mask8  = 0xFF;
-    for (int i = 0; i < size; i++) {
-        tmp = data[i];
-        sum += s_table8[tmp & mask8] + s_table8[(tmp >> 8) & mask8];
+    int i;
+    for (i = 0; i <= size - 4; i += 4) {
+        tmp = *(uint64_t*)&data[i];
+        sum += s_table8[tmp & mask8] + s_table8[(tmp >> 8) & mask8]
+        + s_table8[(tmp >> 16) & mask8] + s_table8[(tmp >> 24) & mask8]
+        + s_table8[(tmp >> 32) & mask8] + s_table8[(tmp >> 40) & mask8]
+        + s_table8[(tmp >> 48) & mask8] + s_table8[(tmp >> 56) & mask8];
+    }
+    for (; i < size; i++) {
+        tmp16 = *(uint16_t*)&data[i];
+        sum += s_table8[tmp16 & mask8] + s_table8[(tmp16 >> 8) & mask8];
     }
     return sum;
 }
